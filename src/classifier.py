@@ -77,14 +77,43 @@ def train_svm(X_train, y_train):
 
 def train_neural_network(X_train, y_train_encoded, num_classes):
     y_train_cat = to_categorical(y_train_encoded, num_classes=num_classes)
+    
     ann_model = Sequential([
         Input(shape=(X_train.shape[1],)),
         Dense(16, activation='relu'),
         Dense(8, activation='relu'),
         Dense(num_classes, activation='softmax')
     ])
+    
     ann_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    ann_model.fit(X_train, y_train_cat, epochs=50, batch_size=32, verbose=0)
+    
+    history = ann_model.fit(X_train, y_train_cat, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+    
+    # Generation of Accuracy and Loss graphs in English
+    plt.figure(figsize=(10, 4))
+    
+    # Graph 1: Accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Train')
+    plt.plot(history.history['val_accuracy'], label='Validation')
+    plt.title('Accuracy per Epoch')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend()
+    
+    # Graph 2: Loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Train')
+    plt.plot(history.history['val_loss'], label='Validation')
+    plt.title('Loss per Epoch')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend()
+    
+    plt.tight_layout()
+    plt.savefig('images/rna_learning_curve.png', dpi=300)
+    plt.close()
+
     return ann_model
 
 def main():
